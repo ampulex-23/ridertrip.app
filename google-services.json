@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "367966051434",
+    "project_id": "rezorto",
+    "storage_bucket": "rezorto.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:367966051434:android:db899e563efced24223e13",
+        "android_client_info": {
+          "package_name": "rezorto.android.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "367966051434-nmt40d5r5fqf47iio2rc7fs2t6gq1nql.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCo7omHresVHDSjwoIU1nEGbl2F4It_5oY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "367966051434-nmt40d5r5fqf47iio2rc7fs2t6gq1nql.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
