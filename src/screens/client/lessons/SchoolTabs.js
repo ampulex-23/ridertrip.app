@@ -29,7 +29,6 @@ class SchoolTabsContainer extends Component {
 					name="Invoices"
 					component={InvoicesList}
 					options={{ title: "Invoices" }}
-					initialParams={this.state}
 					listeners={({ navigation }) => ({
 						tabPress: tabPress(navigation, "School", "Invoices")
 					})}
@@ -54,4 +53,6 @@ class SchoolTabsContainer extends Component {
 		);
 	}
 }
-export default connect(state => ({auth: state.auth}))(SchoolTabsContainer);
+export default connect(state => ({
+	...state
+}))(SchoolTabsContainer);

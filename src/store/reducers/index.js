@@ -1,10 +1,6 @@
 import { combineReducers } from 'redux';
-import { authReducer } from './Auth';
-import { resortsReducer } from './Resorts';
-import { lessonsReducer } from './Lessons';
+import { authReducer as auth } from './auth';
+import { listsReducer as lists } from './lists';
+import { lessonsReducer as lessons } from './lessons';
 
-export default combineReducers({
-	auth: authReducer,
-	resorts: resortsReducer,
-	lessons: lessonsReducer,
-});
+export default combineReducers({ auth,	lists, lessons });

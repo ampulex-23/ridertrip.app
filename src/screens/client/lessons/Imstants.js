@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { View, Text, ScrollView } from 'react-native';
 import { Container } from 'native-base';
-import { containerStyles, textStyles } from "../../../helpers/styling";
+import { textStyles } from "../../../helpers/styling";
 import UserItem from '../../../components/common/UserListItem.js';
 
 class InstantsContainer extends Component {
@@ -12,7 +12,7 @@ class InstantsContainer extends Component {
 	}
 
 	render () {
-		const { lessons: { coaches } } = this.props;
+		const { lessons: { coaches = [] } } = this.props;
 
 		return (
 			<Container>

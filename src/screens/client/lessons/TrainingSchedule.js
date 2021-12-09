@@ -11,7 +11,13 @@ class TrainingScheduleCpntainer extends Component {
 	}
 
 	render () {
-		const { invoices: lessons, navigation } = this.props;
+		const { auth: { user }, navigation } = this.props;
+		const { role: { name: r }, [r.toLowerCase()]: { lessons: _list = [] } } = user;
+		const lessons = _list.filter(l => 
+			l.status === 'waitpaiment' ||
+			l.status === 'payed' || 
+			l.status === 'active'
+		);
 		return (
 			<View stle={[ containerStyles.flexCenter, containerStyles.flexCol ]}>
 				{lessons.length === 0 &&
@@ -28,7 +34,7 @@ class TrainingScheduleCpntainer extends Component {
 					marginTop: 10,
 					paddingHorizontal: 10
 				}}>
-					{lessons.filter(training => training.type !== 'Invoice').map(invoice => {
+					{lessons.map(invoice => {
 						return <InvoiceCard invoice={invoice} key={invoice.id} navigation={navigation}/>
 					})}
 				</ScrollView>
@@ -39,7 +45,5 @@ class TrainingScheduleCpntainer extends Component {
 }
 
 export default connect(
-	state => ({
-		...state.lessons
-	})
+	state => ({	...state })
 )(TrainingScheduleCpntainer);

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import OneSignal from 'react-native-onesignal';
 import { Provider } from 'react-redux';
 import { AsyncStorage } from 'react-native';
 import { Root, Container, Content, Body } from 'native-base';
@@ -11,8 +12,7 @@ import CoachScreen from './src/screens/client/unstacked/CoachScreen';
 import RezortoHeader from './src/components/common/RezortoHeader';
 
 import {
-	fetchResorts, fetchInvoices, fetchCoaches,
-	login, register, me
+	access, me,	resorts, services, skills, enums, theme
 } from './src/api';
 
 import { NavigationContainer } from '@react-navigation/native';
@@ -37,6 +37,8 @@ const Training = function (props) {
 	)
 };
 
+const OS_APP_ID = "68ad93e6-c2ab-42df-9f8b-57dd99c6240b";
+const USER_ID = process.env.USER_ID || 8;
 class App extends Component {
 
 	static initialState = {
@@ -46,7 +48,9 @@ class App extends Component {
 		resorts: null,
 		invoices: null,
 		lessons: null,
-		routes: []
+		routes: [],
+		requiresPrivacyConsent: false,
+		theme: null
 	};
 	state = App.initialState;
 
@@ -58,9 +62,33 @@ class App extends Component {
 
 	componentDidMount = async () => {
 		await Font.loadAsync(usedFonts);
-		const resorts = await fetchResorts(false);
 		await SplashScreen.preventAutoHideAsync();
-		const auth = await this.checkAppCredsAndroid();
+		const auth = await access({ id: USER_ID });
+		const { jwt } = auth;
+		const user = await me();
+		const invoices = [
+			...(user.client ? user.client.lessons : []),
+			...(user.instructor ? user.instructor.lessons : [])
+		];
+		const _resorts = await resorts();
+		const _theme = await theme();
+		await services();
+		await skills();
+		await enums();
+		await SplashScreen.hideAsync();
+		this.setState({
+			...this.state,
+			user, jwt, invoices, lessons: invoices,
+			resorts: _resorts, theme: _theme, appIsReady: true
+		});
+		OneSignal.setRequiresUserPrivacyConsent(this.state.requiresPrivacyConsent);
+		OneSignal.setLogLevel(6, 0);
+		OneSignal.setAppId(OS_APP_ID);
+		OneSignal.promptForPushNotificationsWithUserResponse(response => {
+    	console.log("Prompt response:", response);
+    });
+		
+		/*const auth = await this.checkAppCredsAndroid();
 		if (auth) {
 			const invoices = await fetchInvoices(auth.jwt);
 			const coaches = await fetchCoaches(auth.jwt);
@@ -68,12 +96,13 @@ class App extends Component {
 			store.dispatch({ type: "STORE_RESORTS", resorts });
 			store.dispatch({ type: "STORE_INVOICES", invoices });
 			store.dispatch({ type: "STORE_COACHES", coaches });
+			
 			this.setState({
 				...this.state, ...auth, invoices, resorts,
 				appIsReady: true
 			});
 			await SplashScreen.hideAsync();
-		}
+		}*/
 	};
 	restoreState = async () => {
 		try {
@@ -138,6 +167,7 @@ class App extends Component {
 							/>
 							<RootStack.Screen
 								name="Profile"
+								user={user}
 								options={options("My profile data")}
 								component={MyProfile}
 							/>

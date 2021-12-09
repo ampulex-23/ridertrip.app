@@ -83,23 +83,7 @@ class ResortsListContainer extends Component {
 		const found = this.prepareMarkers(true);
 		return (
 			<View style={containerStyles.container}>
-				{mapShown &&
-				<Container style={{ flex: mapShown ? 0.4 : 0.1 }}>
-					<MapView
-						style={mapStyle.map}
-						region={geo}
-					>
-						{this.prepareMarkers()}
-					</MapView>
-				</Container>}
-
-				<Switch
-					value={mapShown}
-					onChange={() => this.setState({ ...this.state, mapShown: !mapShown })}
-					style={{ position: "absolute", top: mapShown ? 20 : 5, left: !mapShown ? 10 : 10 }}
-				/>
-				{!mapShown && <Text style={{ position: "absolute", top: 10, left: 60 }}>Show map</Text>}
-				<SafeAreaView style={{ flex: mapShown ? 0.6 : 0.9 }}>
+				<SafeAreaView style={{ flex: 1 }}>
 					<FlatList
 						data={[ ...found, ...(resorts.filter(r => !found.map(({id}) => id).includes(r.id)))]
 							.map(resort => ({...resort, onMap: resort.distance > 0}))
@@ -117,7 +101,7 @@ class ResortsListContainer extends Component {
 									const [ latitude, longitude ] = item.location.split(",").map(v => +v);
 									this.setState({...this.state, geo: {...this.state.geo, latitude, longitude}});
 								}}
-								style={[ mapStyle.item, { flex: 1, backgroundColor: item.onMap ? '#F0F0FF' : '#FFFFFF' } ]}>
+								style={[ mapStyle.item, { flex: 1, backgroundColor: item.onMap ? '#FFFFFF' : '#FFFFFF' } ]}>
 								<Text style={mapStyle.title}>{item.name}</Text>
 								<Ionicons name='chevron-forward' color='gray' size={20}/>
 							</TouchableOpacity> : null
@@ -132,5 +116,5 @@ class ResortsListContainer extends Component {
 
 export default connect(state => ({
 	auth: state.auth,
-	resorts: state.resorts.resorts
+	resorts: state.lists.resorts
 }))(ResortsListContainer);

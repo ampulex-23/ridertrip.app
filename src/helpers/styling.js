@@ -5,7 +5,7 @@ const buttonStyles = StyleSheet.create({
 	footerActionButton: {
 		position: 'absolute',
 		bottom: 0,
-		height: 50,
+		height: 80,
 		width: Dimensions.get('screen').width - 16,
 		margin: 8,
 		borderRadius: 4,

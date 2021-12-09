@@ -1,38 +1,92 @@
-import { getHeaders, BASE_URL } from './headers';
-import { Toast } from 'native-base';
+import { getHeaders, BASE_URL as apiUrl } from './headers';
+import store from '../store/store';
+import * as TYPES from '../store/actions/types';
 
-const register = async ({ email, password, username }) => {
-	const body = JSON.stringify({ username, email, password });
-	const response = await fetch(`${BASE_URL}/auth/local/register`, {
-		method: "POST", mode: 'cors',
-		headers: getHeaders(false, true), body
-	}).then(data => data.json());
-	(response.data && response.data.jwt) && Toast.show({
-		text: "User application registered. Don't forget to fill your profile.",
-		buttonText: 'Ok', type: 'success', position: 'bottom', duration: 5000
-	});
-	!response.data && Toast.show({
-		text: "Error (" + response.code + ") " + response.message,
-		buttonText: 'Ok', type: 'error', position: 'bottom', duration: 5000
-	});
-	const { data: { user, jwt } } = response;
-	return user;
+const mode = 'cors';
+
+const register = async ({ phoneNumber, role = 'client' }) => {
+	const body = JSON.stringify({ phoneNumber });
+	const headers = getHeaders(false, true);
+	const method = 'POST';
+	try {
+		const { user, os } = await (
+			await fetch(
+				`${apiUrl}/users/register/${role}`,
+				{ method, mode, headers, body }
+			)
+		).json();
+		store.dispatch({
+			type: TYPES.CREATE_USERS_REGISTER,
+			user, os
+		});
+		return { user, os };
+	} catch (error) {
+		throw error;
+	}
 };
 
-const login = async ({ email, password = "ZxCvBnAsDf777#" }) => {
-	const auth = await fetch(`${BASE_URL}/auth/local`, {
-		method: "POST", mode: 'cors',
-		headers: getHeaders(false, true),
-		body: JSON.stringify({ identifier: email, password })
-	}).then(data => data.json());
-	return auth && auth.jwt ? auth : false;
+const access = async ({ id }) => {
+	const headers = getHeaders(false, true);
+	const method = 'POST';
+	try {
+		const { user, jwt } = await (
+			await fetch(
+				`${apiUrl}/users/access/${id}`,
+				{ method, mode, headers }
+			)
+		).json();
+		store.dispatch({
+			type: TYPES.GET_USERS_ACCESS,
+			user, jwt
+		});
+		return { user, jwt };
+	} catch(error) {
+		throw error;
+	}
 };
 
-const me = async (token) => {
-	const user = await fetch(`${BASE_URL}/users/me`, {
-		method: "GET", mode: 'cors',
-		headers: getHeaders(token, false)
-	}).then(data => data.json());
-	return user && user.id ? { user, jwt: token } : false;
+const me = async () => {
+	const { auth: { jwt } } = store.getState();
+	const headers = getHeaders(jwt, false);
+	const method = 'GET';
+	try {
+		const user = await (
+			await fetch(`${apiUrl}/users/me`, {	method, mode, headers })
+		).json();
+		if (user.role.name === 'Client') {
+			user.client = await (
+				await fetch(`${apiUrl}/users/me/client`, { method, mode, headers })
+			).json();
+		} else {
+			user.instructor = await (
+				await fetch(`${apiUrl}/users/me/instructor`, { method, mode, headers })
+			).json();
+		}
+		store.dispatch({ type: TYPES.GET_USERS_ME, user	});
+		return user;
+	} catch (error) {
+		throw error;		
+	}
 };
-export { login, register, me }
+
+const update = async (path = '', id, changes = {}) => {
+	const method = 'PUT';
+	const { auth: { jwt } } = store.getState();
+	const headers = getHeaders(jwt, false);
+	const url = `${apiUrl}/users/me${path}`;
+	const body = JSON.stringify({ ...changes, id });
+	try {
+		const updated = await (
+			await fetch(url, { method, mode, headers, body })
+		).json();
+		const PATH = path.replace('/', '_').toUpperCase();
+		store.dispatch({
+			type: TYPES.UPDATE_USERS_ME + PATH
+		})
+		return updated;	
+	} catch (error) {
+		throw error;
+	}
+};
+
+export { access, register, me, update }

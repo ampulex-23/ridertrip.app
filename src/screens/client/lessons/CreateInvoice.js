@@ -492,17 +492,13 @@ const mapStateToProps = state => ({
 	auth: state.auth,
 	jwt: state.auth.jwt,
 	user: state.auth.user,
-	resorts: state.resorts.resorts,
-	current: state.resorts.current,
-	invoices: state.lessons.invoices,
-	lessons: state.lessons.lessons
+	resorts: state.lists.resorts,
+	current: state.lists.currentResort || null,
+	invoices: state.auth.user.client?.lessons || [],
+	lessons: state.auth.user.client?.lessons || []
 });
-const mapDispatchToProps = {
-	addInvoice,
-	updateInvoice,
-	updateProfile
-};
+
 export default connect(
 	mapStateToProps,
-	mapDispatchToProps
+	null
 )(CreateInvoiceContainer);

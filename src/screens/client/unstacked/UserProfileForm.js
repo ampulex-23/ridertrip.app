@@ -18,7 +18,7 @@ class UserProfileFormContainer extends Component {
 		user: null,
 		age: null,
 		gender: 'male',
-		level: ''
+		minlevel: 'novice'
 	};
 
 	constructor (props, ctx) {
@@ -37,7 +37,6 @@ class UserProfileFormContainer extends Component {
 			method: "PUT", mode: 'cors', headers, body
 		}).then(data => data.json());
 		if ('id' in response) {
-			this.props.updateProfile(response);
 			this.setState({
 				...this.state,
 				user: response
@@ -72,10 +71,10 @@ class UserProfileFormContainer extends Component {
 			paddingRight: 0,
 			marginRight: -4
 		};
-		if (!this.props.user) {
+		if (!this.props.auth.user) {
 			return null;
 		}
-		const { userpic } = this.props.user;
+		const { userpic = false } = this.props.auth.user;
 		const picPickerStyle = [ {
 			alignSelf: userpic ? 'center' : 'center',
 			justifyContent: 'center',
@@ -92,7 +91,9 @@ class UserProfileFormContainer extends Component {
 			marginLeft: 15,
 			elevation: 0
 		} ];
-		const imageUrl = Object.values(userpic.formats)[ 0 ]?.url || false;
+		const imageUrl = userpic && userpic.formats
+			? Object.values(userpic.formats)[0].url
+			: 'https://www.gravatar.com/avatar/1556dbd9a7903cc5e91ea09f3fa3b645?d=mm';
 
 		return (
 			<Container>
@@ -123,12 +124,12 @@ class UserProfileFormContainer extends Component {
 							<Item inlineLabel>
 								<Label style={labelStyle}>Firstname</Label>
 								<Input
-									style={inputStyle} value={this.props.user?.firstname || ''}
+									style={inputStyle} value={this.props.auth.user?.firstname || ''}
 									onChangeText={(firstname) =>
 										this.setState({
 											...this.state,
 											user: {
-												...this.props.user,
+												...this.props.auth.user,
 												firstname
 											}
 										})
@@ -138,12 +139,12 @@ class UserProfileFormContainer extends Component {
 							<Item inlineLabel>
 								<Label style={labelStyle}>Lastname</Label>
 								<Input
-									style={inputStyle} value={this.props.user?.lastname || ''}
+									style={inputStyle} value={this.props.auth.user?.lastname || ''}
 									onChangeText={(lastname) =>
 										this.setState({
 											...this.state,
 											user: {
-												...this.props.user,
+												...this.props.auth.user,
 												lastname
 											}
 										})
@@ -154,13 +155,13 @@ class UserProfileFormContainer extends Component {
 								<Label style={labelStyle}>Email</Label>
 								<Input
 									style={inputStyle}
-									value={this.state.client?.email || this.props.user?.client?.email}
+									value={this.state.client?.email || this.props.auth.user?.email}
 									onChangeText={(email) =>
 										this.setState({
 											...this.state,
 											user: {
-												...this.props.user,
-												client: { ...this.props.user?.client, email }
+												...this.props.auth.user,
+												email
 											}
 										})
 									}
@@ -170,11 +171,11 @@ class UserProfileFormContainer extends Component {
 								<Label style={labelStyle}>City</Label>
 								<Input
 									style={inputStyle}
-									value={this.state.user?.city || this.props.user?.city || ''}
+									value={ this.props.auth.user?.city || '' }
 									onChangeText={(email) =>
 										this.setState({
 											...this.state,
-											user: { ...this.props.user, city }
+											user: { ...this.props.auth.user, city }
 										})
 									}
 								/>
@@ -184,7 +185,7 @@ class UserProfileFormContainer extends Component {
 								<Input
 									style={inputStyle}
 									keyboardType="decimal-pad"
-									value={'' + this.props.user?.age}
+									value={'' + this.props.auth.user?.age}
 									onChange={(age) =>
 										this.setState({ ...this.state, age })
 									}
@@ -195,7 +196,7 @@ class UserProfileFormContainer extends Component {
 								<Picker
 									mode="dropdown"
 									style={{ width: undefined }}
-									selectedValue={this.props.user?.gender}
+									selectedValue={this.props.auth.user?.gender}
 									onValueChange={(gender) =>
 										this.setState({ ...this.state, gender })
 									}
@@ -209,7 +210,7 @@ class UserProfileFormContainer extends Component {
 								<Picker
 									mode="dropdown"
 									style={{ width: undefined }}
-									selectedValue={this.props.user?.client?.stuff}
+									selectedValue={this.props.auth.user?.client?.stuff}
 									onValueChange={(stuff) =>
 										this.setState({ ...this.state, stuff })
 									}
@@ -223,7 +224,7 @@ class UserProfileFormContainer extends Component {
 								<Input
 									style={inputStyle}
 									keyboardType="decimal-pad"
-									value={'' + this.props.user?.client?.stage}
+									value={'' + this.props.auth.user?.client?.stage}
 									onChange={(stage) =>
 										this.setState({ ...this.state, stage })
 									}
@@ -234,19 +235,16 @@ class UserProfileFormContainer extends Component {
 								<Picker
 									mode="dropdown"
 									style={{ width: undefined }}
-									selectedValue={this.state.level || this.props.user?.client?.level || 0}
-									onValueChange={(level) =>
-										this.setState({ ...this.state, level })
+									selectedValue={this.state.level || this.props.auth.user?.client?.minlevel || 'novice'}
+									onValueChange={(minlevel) =>
+										this.setState({ ...this.state, minlevel })
 									}
 								>
-									<Picker.Item label="Never tried" value={0}/>
-									<Picker.Item label="Tried once" value={1}/>
-									<Picker.Item label="Tried several times" value={2}/>
-									<Picker.Item label="Trained once" value={3}/>
-									<Picker.Item label="Trained several times" value={4}/>
-									<Picker.Item label="Basic skill" value={5}/>
-									<Picker.Item label="Advanced skill" value={6}/>
-									<Picker.Item label="Professional skill" value={7}/>
+									<Picker.Item label="Novice" value={'novice'}/>
+									<Picker.Item label="Basic" value={'basic'}/>
+									<Picker.Item label="Advanced" value={'advanced'}/>
+									<Picker.Item label="Expert" value={'expert'}/>
+									<Picker.Item label="Pro" value={'pro'}/>
 								</Picker>
 							</Item>
 						</ScrollView>
@@ -267,12 +265,5 @@ class UserProfileFormContainer extends Component {
 	}
 }
 
-const mapStateToProps = state => ({
-	auth: state.auth,
-	user: state.auth.user,
-	jwt: state.auth.jwt
-});
-const mapDispatchToProps = {
-	updateProfile
-};
-export default connect(mapStateToProps, mapDispatchToProps)(UserProfileFormContainer);
+const mapStateToProps = state => ({ ...state });
+export default connect(mapStateToProps)(UserProfileFormContainer);

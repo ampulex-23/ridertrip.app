@@ -4,7 +4,7 @@ import { Text, Image, TouchableOpacity } from 'react-native';
 import { Right, Content } from 'native-base';
 import Menu, { MenuItem, MenuDivider } from 'react-native-material-menu';
 import { Ionicons } from '@expo/vector-icons';
-import { BASE_URL } from '../../api/headers';
+import { BASE_URL as apiUrl } from '../../api/headers';
 
 class RezortoHeaderContainer extends Component {
 
@@ -27,9 +27,12 @@ class RezortoHeaderContainer extends Component {
 	};
 
 	render () {
-		const { auth: { user }, title, navigation } = this.props;
+		const { user, title, navigation } = this.props;
+		//alert("USER = " + JSON.stringify(user.userpic));
 		const userpicFormats = user?.userpic?.formats;
-		const userpicUrl = userpicFormats ? (BASE_URL + Object.values(userpicFormats)[0].url) : false;
+		const userpicUrl = userpicFormats 
+			? (apiUrl + Object.values(userpicFormats)[0].url) 
+			: 'https://www.gravatar.com/avatar/1556dbd9a7903cc5e91ea09f3fa3b645?d=mm';
 		const userpic = user && userpicUrl ?
 			<TouchableOpacity
 				style={{
@@ -86,7 +89,4 @@ class RezortoHeaderContainer extends Component {
 	}
 }
 
-export default connect(state => ({
-	auth: state.auth,
-	user: state.auth.user
-}))(RezortoHeaderContainer);
+export default RezortoHeaderContainer;

@@ -18,8 +18,12 @@ class InvoicesListContainer extends Component {
 	}
 
 	render () {
-		const { invoices, navigation } = this.props;
-
+		const { auth: { user }, navigation } = this.props;
+		const { role: { name: r }, [r.toLowerCase()]: { lessons = [] } } = user;
+		const invoices = lessons.filter(l => 
+			l.status === 'invoice' || 
+			l.status === 'hascoach'
+		);
 		return (
 			<Container stle={[ containerStyles.flexCenter, containerStyles.flexCol ]}>
 				{invoices.length === 0 ?
@@ -36,7 +40,7 @@ class InvoicesListContainer extends Component {
 							marginTop: 10,
 							paddingHorizontal: 10
 						}}>
-							{invoices.filter(invoice => invoice.status === 'Invoice').map(invoice => {
+							{invoices.map(invoice => {
 								return <InvoiceCard invoice={invoice} key={invoice.id} navigation={navigation}/>
 							})}
 						</ScrollView>
@@ -58,5 +62,5 @@ class InvoicesListContainer extends Component {
 }
 
 export default connect(state => ({
-	...state.lessons
+	...state
 }))(InvoicesListContainer);
