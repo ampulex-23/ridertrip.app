@@ -1,5 +1,5 @@
 import { getHeaders, BASE_URL as apiUrl } from './headers';
-import store from '../store/store';
+import store from '../store';
 import * as TYPES from '../store/actions/types';
 
 const mode = 'cors';

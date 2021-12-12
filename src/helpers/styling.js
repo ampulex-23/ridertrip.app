@@ -26,11 +26,11 @@ const textStyles = StyleSheet.create({
 		color: '#808080'
 	},
 	fontExo2: {
-		fontFamily: 'Exo 2',
+		fontFamily: 'Montserat',
 		fontSize: 18
 	},
 	fontRoboto: {
-		fontFamily: 'Roboto',
+		fontFamily: 'Montserat',
 		fontSize: 18
 	}
 });
@@ -64,6 +64,39 @@ const containerStyles = StyleSheet.create({
 		flexDirection: 'row'
 	}
 });
+const formStyle = StyleSheet.create({
+	section: {
+		fontStyle: 'normal',
+		fontWeight: '600',
+		fontSize: 18,
+		lineHeight: 24,
+		color: '#0D1F3C',
+		marginBottom: 16
+	},
+	toggle: {
+		borderColor: '#EDF1F9',
+		fontStyle: 'normal',
+		fontWeight: '600',
+		fontSize: 15,
+		lineHeight: 24,
+		color: '#0D1F3C',
+		borderRadius: 10,
+		height: 46,
+		borderWidth: 2,
+		borderStyle: 'solid',
+		padding: 0,
+		marginRight: 10,
+		textAlign: 'center',
+		textTransform: 'none',
+		textAlignVertical: 'center'
+	},
+	label: {
+		fontWeight: '500',
+		fontSize: 15,
+		lineHeight: 24,
+		color: '#B5BBC9'
+	}
+});
 const mapStyle = StyleSheet.create({
 	map: {
 		width: Dimensions.get('screen').width - 20,
@@ -89,4 +122,4 @@ const mapStyle = StyleSheet.create({
 	}
 });
 
-export { containerStyles, mapStyle, buttonStyles, textStyles, colorScheme }
+export { containerStyles, mapStyle, buttonStyles, textStyles, colorScheme, formStyle }

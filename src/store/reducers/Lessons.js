@@ -3,6 +3,7 @@ import * as TYPES from '../actions/types';
 const initialState = {
 	params: {},
 	invoices: [],
+	preview: null,
 	count: 0
 };
 
@@ -11,6 +12,8 @@ const lessonsReducer = (state = initialState, {
 }) => {
 	let target;
 	switch (type) {
+		case TYPES.SET_INVOICE_PREVIEW:
+			return { ...state, preview: invoice };
 		case TYPES.CREATE_LESSONS_INVOICE:
 			return { ...state, invoices: [...state.invoices, invoice] };
 		case TYPES.GET_LESSONS_INSTRUCTORS:

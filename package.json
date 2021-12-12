@@ -28,6 +28,7 @@
     "expo-notifications": "~0.8.2",
     "expo-sensors": "~9.2.0",
     "expo-splash-screen": "~0.8.1",
+    "moment": "^2.29.1",
     "native-base": "^2.13.15",
     "onesignal-expo-plugin": "^1.0.0-beta7",
     "react": "16.13.1",
