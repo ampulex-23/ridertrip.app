@@ -14,6 +14,14 @@ import { createStackNavigator } from '@react-navigation/stack';
 import store from './src/store';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
+import moment from 'moment';
+
+moment.updateLocale('en', {
+	monthsShort : [
+			"Янв", "Фев", "Мар", "Апр", "Мая", "Июн",
+			"Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"
+	]
+});
 
 const PERSISTENCE_KEY = "REZ.STATE";
 const RootStack = createStackNavigator();

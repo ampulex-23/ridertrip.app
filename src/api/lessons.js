@@ -7,10 +7,11 @@ const mode = 'cors';
 const invoice = async params => {
 	try {
 		const { auth: { jwt, user: { client, client: { lessons } } } } = store.getState();
-		const headers = getHeaders(jwt, false);
+		const headers = getHeaders(jwt, true);
 		const method = 'POST';
 		const body = JSON.stringify(params);
 		const url = `${apiUrl}/lessons/invoice`;
+		console.warn(body);
 		const invoice = await (
 			await fetch(url, { method, mode, headers, body })
 		).json();

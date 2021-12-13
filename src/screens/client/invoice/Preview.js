@@ -4,6 +4,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { containerStyles } from "../../../helpers/styling";
 import { BASE_URL as apiUrl } from "../../../api/headers";
+import { invoice } from "../../../api";
+import moment from 'moment';
 import { StyleSheet, Text, Dimensions } from 'react-native';
 import { SvgUri } from 'react-native-svg';
 import { formStyle } from '../../../helpers/styling';
@@ -71,7 +73,13 @@ class InvoicePreview extends Component {
   };
 
   postInvoice = () => {
-
+    const params = {...this.state.invoice};
+    const data = {
+      ...params,
+      date: moment(params.date).toISOString(),
+      time: moment(params.time).format("HH:mm")
+    };
+    invoice(data).then(console.warn);
   };
 
   render() {
@@ -89,7 +97,7 @@ class InvoicePreview extends Component {
       ]}>
         <View pointerEvents="none"
           style={{ position: 'absolute', opacity: 1, zIndex: 0 }}>
-          <SvgUri uri={apiUrl + theme.SMALL_FRAME.url} height='421' style={{zIndex: 0}} />
+          <SvgUri uri={apiUrl + theme.SMALL_FRAME.url} height='421' style={{ zIndex: 0 }} />
         </View>
         <View style={{ position: 'absolute', zIndex: 1 }}>
           <Text
@@ -108,7 +116,7 @@ class InvoicePreview extends Component {
             {this.getSkills(invoice.skills).map(i => i.name).join(', ')}
           </Text>
           <Text style={[
-            this._styles.headingStyle, 
+            this._styles.headingStyle,
             { top: 189 - ycorr, color: '#347AF0', fontWeight: '400' }
           ]}>
             {this.getResorts(invoice.invoicing).map(i => i.name).join(', ')}
@@ -116,58 +124,63 @@ class InvoicePreview extends Component {
           <Row style={[{
             top: 245,
             paddingLeft: 32 + (Dimensions.get('screen').width - 335) / 2,
-            width: Dimensions.get('screen').width, flex: 1, 
+            width: Dimensions.get('screen').width, flex: 1,
             flexDirection: 'row', justifyContent: 'space-around',
             alignItems: 'center'
           }]}>
             <Col>
               <Label style={formStyle.label}>Дата</Label>
-              <View style={{ left: -10 }}>
-                <DatePicker androidMode='calendar' 
-                  defaultDate={invoice.date} textStyle={{fontSize: 19, fontWeight: '500'}} />
+              <View style={{ left: 0 }}>
+                <Text style={{ fontSize: 19, fontWeight: '500' }}>
+                  {moment(invoice.date).format('DD MMM YYYY')}
+                </Text>
               </View>
             </Col>
-            <Col style={{paddingLeft: 32}}>
+            <Col style={{ paddingLeft: 32 }}>
               <Label style={formStyle.label}>Время</Label>
-              <View style={{ left: -10 }}>
-                <DatePicker androidMode='calendar' textStyle={{fontSize: 19, fontWeight: '500'}}
-                  defaultDate={invoice.time} formatChosenDate={() => '09:00'} />
+              <View style={{ left: 0 }}>
+                <Text style={{ fontSize: 19, fontWeight: '500' }}>
+                  {moment(invoice.time).format('HH:mm')}
+                </Text>
               </View>
             </Col>
           </Row>
           <Separator
-            style={{left: 2 + (Dimensions.get('screen').width - 295) / 2,
+            style={{
+              left: 2 + (Dimensions.get('screen').width - 295) / 2,
               backgroundColor: '#CFD2D8', position: 'absolute', opacity: 0.5,
-              height: 1, width: 295, top: 315 }} />
+              height: 1, width: 295, top: 315
+            }} />
           <Row style={[{
             top: 333, position: 'absolute',
             paddingLeft: 32 + (Dimensions.get('screen').width - 335) / 2,
-            width: Dimensions.get('screen').width, flex: 1, 
+            width: Dimensions.get('screen').width, flex: 1,
             flexDirection: 'row', justifyContent: 'space-around',
             alignItems: 'center'
           }]}>
             <Col>
               <Label style={formStyle.label}>Человек</Label>
               <View style={{ left: 0 }}>
-                <Text style={{fontSize: 19, fontWeight: '500'}}>{invoice.persons}</Text>
+                <Text style={{ fontSize: 19, fontWeight: '500' }}>{invoice.persons}</Text>
               </View>
             </Col>
-            <Col>
+            <Col style={{ paddingLeft: 32 }}>
               <Label style={formStyle.label}>Часов</Label>
               <View style={{ left: 0 }}>
-                <Text style={{fontSize: 19, fontWeight: '500'}}>{invoice.duration}</Text>
+                <Text style={{ fontSize: 19, fontWeight: '500' }}>{invoice.duration}</Text>
               </View>
             </Col>
           </Row>
         </View>
-        <Button 
-          mode='contained' 
+        <Button
+          mode='contained'
           onPress={() => this.postInvoice()}
-          style={{ 
-            borderRadius: 40, background: '#347AF0', 
+          style={{
+            borderRadius: 40, background: '#347AF0',
             marginLeft: '2%', bottom: 34, position: 'absolute',
-            width: '90%', height: 46, 
-            paddingVertical: 5 }}>
+            width: '90%', height: 46,
+            paddingVertical: 5
+          }}>
           Создать заявку
         </Button>
       </View>

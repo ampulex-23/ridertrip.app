@@ -1,10 +1,11 @@
-import { Container, Text, Row, View, Col, DatePicker, Label } from 'native-base';
+import { Container, Text, Row, View, Col, Label } from 'native-base';
 import React, { Component } from 'react';
 import { Button } from 'react-native-paper';
 import { connect } from 'react-redux';
 import { formStyle } from '../../../helpers/styling';
-import store from '../../../store';
-import * as TYPES from '../../../store/actions/types';
+import moment from 'moment';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { TouchableOpacity, TextInput, ScrollView, Dimensions } from 'react-native';
 
 class InvoiceForm extends Component {
 
@@ -13,8 +14,10 @@ class InvoiceForm extends Component {
   };
 
   state = {
+    pickingDate: false,
+    pickingTime: false,
     invoice: {
-      invoicing: [5, 1],
+      invoicing: [1],
       stuff: 'skis',
       minlevel: 'novice',
       persons: 1,
@@ -61,10 +64,35 @@ class InvoiceForm extends Component {
     this.setState({ ...this.state, invoice: { ...this.state.invoice, minlevel } });
   };
 
+  setDateTime = (what = 'date') =>
+    (event, date) => {
+      date && this.setState({
+        ...this.state,
+        pickingDate: false,
+        pickingTime: false,
+        invoice: {
+          ...this.state.invoice,
+          [what]: date
+        }
+      });
+    };
+  
+  sanitize = () => {
+    return {
+      ...this.state.invoice,
+      date: +this.state.invoice.date,
+      time: +this.state.invoice.time
+    }
+  }
+
   render() {
     const { navigation } = this.props;
     return (
-      <Container style={{ paddingTop: 20, paddingLeft: 20, flex: 1, borderRadius: 20, marginTop: -20, zIndex: 1, overflow: 'hidden' }}>
+      <Container style={{ 
+        paddingTop: 20, paddingLeft: 20, flex: 1, 
+        minHeight: Dimensions.get('screen').height - 180,
+        borderRadius: 20, marginTop: -20, zIndex: 1, 
+        overflow: 'hidden' }}>
         <Container>
           <Text style={formStyle.section}>Я ищу</Text>
           <Row>
@@ -130,14 +158,40 @@ class InvoiceForm extends Component {
           <Row>
             <Col>
               <Label style={formStyle.label}>Дата</Label>
-              <View style={{ left: -10 }}>
-                <DatePicker androidMode='calendar' defaultDate={this.state.invoice.date} />
+              <View style={{ left: 0 }}>
+                <TouchableOpacity
+                  onPress={() => this.setState({ ...this.state, 
+                  pickingDate: true, pickingTime: false })}>
+                  <Text style={{fontSize: 19, fontWeight: '500'}}>
+                    {moment(this.state.invoice.date).format("DD MMM YYYY")}
+                  </Text>
+                </TouchableOpacity>
+                {this.state.pickingDate && <DateTimePicker
+                  value={this.state.invoice.date}
+                  mode='date'
+                  dateFormat="day month.abbreviated year.full"
+                  display="default"
+                  onChange={this.setDateTime('date')}
+                />}
               </View>
             </Col>
             <Col>
               <Label style={formStyle.label}>Время</Label>
-              <View style={{ left: -10 }}>
-                <DatePicker androidMode='calendar' defaultDate={this.state.invoice.time} formatChosenDate={() => '09:00'} />
+              <View style={{ left: 0 }}>
+                <TouchableOpacity
+                  onPress={() => this.setState({ ...this.state, 
+                  pickingTime: true, pickingDate: false })}>
+                  <Text style={{fontSize: 19, fontWeight: '500'}}>
+                    {moment(this.state.invoice.time).format('HH:mm')}
+                  </Text>
+                </TouchableOpacity>
+                {this.state.pickingTime && <DateTimePicker
+                  value={this.state.invoice.date}
+                  mode='time'
+                  dateFormat="hour:minute"
+                  display="default"
+                  onChange={this.setDateTime('time')}
+                />}
               </View>
             </Col>
           </Row>
@@ -145,31 +199,48 @@ class InvoiceForm extends Component {
             <Col>
               <Label style={formStyle.label}>Человек</Label>
               <View style={{ left: 0 }}>
-                <Text>{this.state.invoice.persons}</Text>
+              <TextInput 
+                  style={{fontSize: 19, fontWeight: '500'}}
+                  onChangeText={p => 
+                    this.setState({...this.state, 
+                      invoice: { ...this.state.invoice, persons: +p }})}
+                  keyboardType='numeric'
+                  initialValue={'' + this.state.invoice.persons}
+                  value={'' + this.state.invoice.persons}
+                />
               </View>
             </Col>
             <Col>
               <Label style={formStyle.label}>Часов</Label>
               <View style={{ left: 0 }}>
-                <Text>{this.state.invoice.duration}</Text>
+                <TextInput disableFullscreenUI
+                  style={{fontSize: 19, fontWeight: '500'}}
+                  onChangeText={d => 
+                    this.setState({...this.state, 
+                      invoice: { ...this.state.invoice, duration: +d }})}
+                  keyboardType='numeric'
+                  initialValue={'' + this.state.invoice.duration}
+                  value={'' + this.state.invoice.duration}
+                />
               </View>
             </Col>
           </Row>
         </Container>
-        <Button 
-          mode='contained' 
-          onPress={() => 
-            navigation.navigate({ 
-              name: 'InvoicePreview', 
-              params: { 
-                invoice: this.state.invoice 
-              } 
+        <Button
+          mode='contained'
+          onPress={() =>
+            navigation.navigate({
+              name: 'InvoicePreview',
+              params: {
+                invoice: this.sanitize()
+              }
             })}
-          style={{ 
-            borderRadius: 40, background: '#347AF0', 
-            marginLeft: '2%', marginBottom: 40, 
-            width: '90%', height: 46, 
-            paddingVertical: 5 }}>
+          style={{
+            borderRadius: 40, background: '#347AF0',
+            marginLeft: '2%', marginBottom: 40,
+            width: '90%', height: 46,
+            paddingVertical: 5
+          }}>
           Создать заявку
         </Button>
       </Container>
@@ -183,4 +254,4 @@ export default connect((ownProps, state) => {
     ...ownProps,
     ...state
   }
-}, )(InvoiceForm);
+})(InvoiceForm);

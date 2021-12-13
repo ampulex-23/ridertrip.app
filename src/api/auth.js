@@ -65,12 +65,15 @@ const me = async () => {
 					l.review = await review(l.review);
 				}
 				if (l.answers && l.answers.length) {
-					l.answers.forEach(async a => {
+					await l.answers.forEach(async a => {
 						if (typeof a.instructor.license === 'number') {
 							a.instructor.license = await license(a.instructor.license);
-							a.instructor.reviews = await a.instructor.reviews.map(async rev => {
-								return await review(rev.id || rev);
-							})
+							if (a.instructor.reviews) {
+								a.instructor.reviews = 
+									await a.instructor.reviews.map(async rev => {
+										return await review(rev.id || rev);
+								})
+							}
 						}
 					})
 				}
